@@ -1,0 +1,6 @@
+packages:
+  - "packages/*"
+# esbuild (via tsup) ships a postinstall binary build; pnpm 10 blocks build
+# scripts by default, so allow this one explicitly.
+onlyBuiltDependencies:
+  - esbuild

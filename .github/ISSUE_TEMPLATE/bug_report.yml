@@ -1,0 +1,64 @@
+name: 🐛 Bug report
+description: Something isn't working as documented.
+title: 'bug: '
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report! Please **never paste real secret values or tokens** —
+        use placeholders. For security issues, see our
+        [Security Policy](https://github.com/simplyform/simplyforms-js/security/policy)
+        instead of this form.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear description of the bug and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Minimal reproduction
+      description: The smallest snippet that reproduces it. Redact form IDs/tokens.
+      render: ts
+      placeholder: |
+        import { SimplyForms } from 'simplyforms';
+        const sf = new SimplyForms('FORM_ID');
+        await sf.submit({ email: 'a@b.com' });
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: simplyforms version
+      description: e.g. 0.1.0
+    validations:
+      required: true
+  - type: dropdown
+    id: runtime
+    attributes:
+      label: Runtime
+      options:
+        - Browser
+        - Node
+        - Bun
+        - Deno
+        - Edge (Cloudflare Workers / Vercel Edge)
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: runtime-version
+    attributes:
+      label: Runtime version
+      description: e.g. Node 20.11, Chrome 130.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / output
+      description: Relevant error output. Redact secrets.
+      render: shell

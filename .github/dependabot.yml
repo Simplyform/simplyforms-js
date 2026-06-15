@@ -1,0 +1,41 @@
+version: 2
+updates:
+  # npm dependencies across the workspace root and both packages.
+  - package-ecosystem: npm
+    directories:
+      - '/'
+      - '/packages/simplyforms'
+      - '/packages/sdk'
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 10
+    groups:
+      # One PR per directory for all non-major bumps to keep noise down.
+      npm-dependencies:
+        patterns:
+          - '*'
+        update-types:
+          - minor
+          - patch
+    ignore:
+      # Upgrade these majors deliberately, not via automated PRs — they tend
+      # to introduce breaking type-checking changes.
+      - dependency-name: typescript
+        update-types: ['version-update:semver-major']
+    labels:
+      - dependencies
+
+  # Keep the SHA-pinned GitHub Actions current.
+  - package-ecosystem: github-actions
+    directory: '/'
+    schedule:
+      interval: weekly
+      day: monday
+    labels:
+      - dependencies
+      - github-actions
+    groups:
+      actions:
+        patterns:
+          - '*'

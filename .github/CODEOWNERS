@@ -1,0 +1,11 @@
+# Code owners are requested for review automatically on matching paths.
+# https://docs.github.com/articles/about-code-owners
+
+# Everything
+*                          @lasalasa
+
+# The client engine — highest-sensitivity code.
+/packages/simplyforms/     @lasalasa
+
+# Release, CI, and security automation.
+/.github/                  @lasalasa
