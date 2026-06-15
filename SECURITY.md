@@ -6,8 +6,7 @@ responsible disclosure.
 
 ## Supported versions
 
-`simplyforms` and `@simplyforms/sdk` ship in lockstep. Security fixes land on the latest minor
-and are released as a new patch.
+Security fixes for `@simplyforms/sdk` land on the latest minor and are released as a new patch.
 
 | Version      | Supported              |
 | ------------ | ---------------------- |
@@ -46,7 +45,7 @@ affected version(s) and runtime.
 
 ## Supply chain
 
-- Both packages are published from CI via **npm Trusted Publishing (OIDC)** with **provenance** —
+- The package is published from CI via **npm Trusted Publishing (OIDC)** with **provenance** —
   no long-lived npm tokens exist.
 - GitHub Actions are pinned to commit SHAs and updated by Dependabot.
 - Each release attaches a CycloneDX SBOM to its GitHub Release.

@@ -4,8 +4,8 @@
 # Everything
 *                          @lasalasa
 
-# The client engine — highest-sensitivity code.
-/packages/simplyforms/     @lasalasa
+# The client package.
+/packages/sdk/             @lasalasa
 
 # Release, CI, and security automation.
 /.github/                  @lasalasa

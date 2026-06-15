@@ -4,7 +4,6 @@ updates:
   - package-ecosystem: npm
     directories:
       - '/'
-      - '/packages/simplyforms'
       - '/packages/sdk'
     schedule:
       interval: weekly

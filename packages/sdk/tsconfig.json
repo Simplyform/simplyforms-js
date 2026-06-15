@@ -3,5 +3,5 @@
   "compilerOptions": {
     "noEmit": true
   },
-  "include": ["src", "tsup.config.ts"]
+  "include": ["src", "test", "tsup.config.ts"]
 }

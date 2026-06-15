@@ -24,7 +24,7 @@ body:
       description: The smallest snippet that reproduces it. Redact form IDs/tokens.
       render: ts
       placeholder: |
-        import { SimplyForms } from 'simplyforms';
+        import { SimplyForms } from '@simplyforms/sdk';
         const sf = new SimplyForms('FORM_ID');
         await sf.submit({ email: 'a@b.com' });
     validations:

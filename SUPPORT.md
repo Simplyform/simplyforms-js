@@ -1,6 +1,6 @@
 # Support
 
-- 📖 **Docs:** the [`simplyforms` README](./packages/simplyforms/README.md) and
+- 📖 **Docs:** the [`@simplyforms/sdk` README](./packages/sdk/README.md) and
   [simplyforms.dev](https://www.simplyforms.dev).
 - 💬 **Questions & ideas:** [GitHub Discussions](https://github.com/simplyform/simplyforms-js/discussions).
 - 🐛 **Bugs / feature requests:** [open an issue](https://github.com/simplyform/simplyforms-js/issues/new/choose).

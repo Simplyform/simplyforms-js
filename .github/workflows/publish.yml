@@ -65,17 +65,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Publish simplyforms
-        working-directory: packages/simplyforms
-        run: |
-          VERSION=$(node -p "require('./package.json').version")
-          if npm view "simplyforms@$VERSION" version > /dev/null 2>&1; then
-            echo "simplyforms@$VERSION already published, skipping."
-          else
-            pnpm pack
-            npm publish ./simplyforms-$VERSION.tgz --provenance --access public
-          fi
-
       - name: Publish @simplyforms/sdk
         working-directory: packages/sdk
         run: |
@@ -94,13 +83,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          VERSION=$(node -p "require('./packages/simplyforms/package.json').version")
+          VERSION=$(node -p "require('./packages/sdk/package.json').version")
           if git rev-parse "v$VERSION" > /dev/null 2>&1; then
             echo "v$VERSION already tagged; nothing to release."
             exit 0
           fi
-          if ! npm view "simplyforms@$VERSION" version > /dev/null 2>&1; then
-            echo "simplyforms@$VERSION is not on npm (no publish this run); skipping release."
+          if ! npm view "@simplyforms/sdk@$VERSION" version > /dev/null 2>&1; then
+            echo "@simplyforms/sdk@$VERSION is not on npm (no publish this run); skipping release."
             exit 0
           fi
           pnpm dlx @cyclonedx/cdxgen@^11 -t pnpm -r -o sbom.cdx.json \
@@ -109,7 +98,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git tag -a "v$VERSION" -m "v$VERSION"
           git push origin "v$VERSION"
-          NOTES="Published \`simplyforms@$VERSION\` and \`@simplyforms/sdk@$VERSION\` to npm with provenance. See packages/simplyforms/CHANGELOG.md for details."
+          NOTES="Published \`@simplyforms/sdk@$VERSION\` to npm with provenance. See packages/sdk/CHANGELOG.md for details."
           if [ -f sbom.cdx.json ]; then
             gh release create "v$VERSION" --title "v$VERSION" --notes "$NOTES" sbom.cdx.json
           else

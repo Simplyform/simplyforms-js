@@ -37,8 +37,6 @@ jobs:
       - name: Lint & format check
         run: pnpm lint
 
-      # Build first: the @simplyforms/sdk alias typechecks and builds against
-      # the `simplyforms` package's emitted .d.ts, which only exists after build.
       - name: Build
         run: pnpm -r build
 

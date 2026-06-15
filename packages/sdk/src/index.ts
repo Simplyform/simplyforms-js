@@ -1,8 +1,35 @@
 /**
- * `@simplyforms/sdk` — a thin alias of the `simplyforms` package.
+ * @simplyforms/sdk — official JavaScript/TypeScript client for SimplyForms.
  *
- * Both packages expose the identical API; install whichever name you prefer.
- * See the `simplyforms` package for full documentation.
+ * @example
+ * ```ts
+ * import { SimplyForms } from '@simplyforms/sdk';
+ *
+ * const sf = new SimplyForms('YOUR_FORM_ID');
+ * await sf.submit({ email: 'jane@example.com', message: 'Hello!' });
+ * ```
  */
-export * from 'simplyforms';
-export { default } from 'simplyforms';
+export { SimplyForms } from './client';
+export { SimplyForms as default } from './client';
+
+export {
+  SimplyFormsAPIError,
+  SimplyFormsConnectionError,
+  SimplyFormsError,
+  SimplyFormsNotFoundError,
+  SimplyFormsRateLimitError,
+  SimplyFormsServerError,
+  SimplyFormsTimeoutError,
+  SimplyFormsValidationError,
+  mapStatusToError,
+} from './errors';
+export type { SimplyFormsErrorCode } from './errors';
+
+export type {
+  FileInput,
+  RetryConfig,
+  SimplyFormsConfig,
+  SubmitData,
+  SubmitOptions,
+  SubmitResult,
+} from './types';
