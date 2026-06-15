@@ -16,3 +16,5 @@ coverage/
 .DS_Store
 Thumbs.db
 .claude/settings.local.json
+# Local AI assistant guidance — kept untracked (references machine-specific sibling paths).
+CLAUDE.md
