@@ -35,6 +35,12 @@ if (result.redirectUrl) {
 
 `YOUR_FORM_ID` is the form's UUID **or** its 10-character short ID — both work.
 
+The default export is the same class, if you prefer it:
+
+```ts
+import SimplyForms from '@simplyforms/sdk';
+```
+
 ## Configuration
 
 ```ts
