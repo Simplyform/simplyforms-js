@@ -1,16 +1,23 @@
 # Release pipeline. Filename kept as publish.yml so the npm Trusted Publisher
 # binding (org/repo + workflow filename) does not need to be reconfigured.
 #
+# Publishing is STAGED: CI never makes a version public on its own. It stages
+# the tarball; a maintainer reviews and approves it with 2FA, and only then is
+# it installable. See docs/maintainers.md for the approval runbook.
+#
 # Flow:
 #   1. A push to main with a pending changeset -> changesets/action opens (or
-#      updates) the "Version Packages" PR. Nothing is published.
-#   2. Merging that PR bumps both package versions in lockstep and lands the
-#      CHANGELOGs on main. The next push has no changesets, so the publish step
-#      runs: it packs (pnpm pack rewrites workspace:* to the real version) and
-#      publishes both packages to npm with provenance via OIDC Trusted
-#      Publishing. Already-published versions are skipped, so re-runs are safe.
-#   3. After a real publish it creates the v<version> git tag and a GitHub
-#      Release with the CycloneDX SBOM attached.
+#      updates) the "Version Packages" PR. Nothing is staged.
+#   2. Merging that PR bumps the version and lands the CHANGELOG on main. The
+#      next push has no changesets, so the stage step runs: it stages
+#      @simplyforms/sdk to npm with provenance via OIDC Trusted Publishing.
+#      Already-published or already-staged versions are skipped, so re-runs are
+#      safe. The package is NOT public yet.
+#   3. A maintainer reviews (`npm stage list/view`) and approves with 2FA
+#      (`npm stage approve <stage-id>`) - off-CI.
+#   4. Re-run this workflow (Actions -> Run workflow / workflow_dispatch). Now
+#      the version is live on npm, so it creates the v<version> git tag and a
+#      GitHub Release with the CycloneDX SBOM attached. Idempotent.
 name: Publish Package
 
 on:
@@ -45,6 +52,14 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           cache: pnpm
 
+      # `npm stage` (staged publishing) needs npm >= 11.15.0, which is newer than
+      # the npm bundled with Node 24 (OIDC trusted publishing itself needs
+      # >= 11.5.1, also newer than the bundled npm). Pin a known-good version so
+      # the stage steps below resolve the command and the OIDC publish works.
+      # Bump deliberately.
+      - name: Update npm for staged publishing
+        run: npm install -g npm@11.17.0
+
       - run: pnpm install --frozen-lockfile
 
       - name: Build
@@ -54,9 +69,10 @@ jobs:
         run: pnpm -r test
 
       # Opens/updates the "Version Packages" PR when changesets are pending.
-      # No `publish` input: the actual npm publish stays on the proven pnpm
-      # pack path below so workspace:* is rewritten correctly.
+      # No `publish` input: the actual publish stays on the explicit `npm stage`
+      # step below so we control staging + the OIDC/provenance flags.
       - name: Create or update the Version Packages PR
+        id: changesets
         uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1.9.0
         with:
           version: pnpm changeset version
@@ -65,31 +81,46 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Publish @simplyforms/sdk
+      # Stage only after the Version PR has merged (no pending changesets).
+      # During the run that merely opens the Version PR, changesets/action has
+      # already bumped package.json in the working tree -- staging here would
+      # stage that version before the Version PR is merged.
+      #
+      # @simplyforms/sdk has no workspace dependencies, so `npm stage publish`
+      # stages the package directory as-is (no `workspace:*` rewrite, no pack).
+      - name: Stage @simplyforms/sdk
+        if: steps.changesets.outputs.hasChangesets == 'false'
         working-directory: packages/sdk
         run: |
           VERSION=$(node -p "require('./package.json').version")
           if npm view "@simplyforms/sdk@$VERSION" version > /dev/null 2>&1; then
             echo "@simplyforms/sdk@$VERSION already published, skipping."
+          elif npm stage list "@simplyforms/sdk" --json 2>/dev/null | grep -q "\"$VERSION\""; then
+            echo "@simplyforms/sdk@$VERSION already staged, skipping."
           else
-            pnpm pack
-            npm publish ./simplyforms-sdk-$VERSION.tgz --provenance --access public
+            npm stage publish --provenance --access public
           fi
 
-      # Only fires the first time a version reaches npm: tags v<version> and
-      # cuts a GitHub Release with a CycloneDX SBOM attached. Idempotent — the
-      # tag-existence check makes re-runs no-ops.
+      # Only fires once a version is actually live on npm -- i.e. AFTER a
+      # maintainer has approved the staged package (2FA). It is skipped on the
+      # staging run (the version isn't public yet) and runs on the post-approval
+      # workflow_dispatch re-run: tags v<version> and cuts a GitHub Release with a
+      # CycloneDX SBOM attached. Idempotent -- the tag-existence check makes
+      # re-runs no-ops.
       - name: Tag and release with SBOM
+        if: steps.changesets.outputs.hasChangesets == 'false'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # Runs at repo root, so reads the published package (packages/sdk),
+          # not the private root @simplyforms/monorepo manifest.
           VERSION=$(node -p "require('./packages/sdk/package.json').version")
           if git rev-parse "v$VERSION" > /dev/null 2>&1; then
             echo "v$VERSION already tagged; nothing to release."
             exit 0
           fi
           if ! npm view "@simplyforms/sdk@$VERSION" version > /dev/null 2>&1; then
-            echo "@simplyforms/sdk@$VERSION is not on npm (no publish this run); skipping release."
+            echo "@simplyforms/sdk@$VERSION is not on npm (not approved yet this run); skipping release."
             exit 0
           fi
           pnpm dlx @cyclonedx/cdxgen@^11 -t pnpm -r -o sbom.cdx.json \

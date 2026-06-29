@@ -49,9 +49,11 @@ We use [changesets](https://github.com/changesets/changesets).
    describe it.
 3. Open a PR. CI runs lint, build, typecheck, tests, and export checks across the Node matrix.
 
-On merge to `main`, the release workflow opens a "Version Packages" PR. Merging that PR publishes
-`@simplyforms/sdk` to npm via **OIDC Trusted Publishing with provenance** (no tokens), tags the
-release, and attaches an SBOM.
+On merge to `main`, the release workflow opens a "Version Packages" PR. Merging that PR **stages**
+`@simplyforms/sdk` to npm via **OIDC Trusted Publishing with provenance** (no tokens) — the version
+is **not public yet**. A maintainer then approves it with 2FA (`npm stage approve`), and a re-run of
+the workflow tags the release and attaches an SBOM. The full approval runbook (and the one-time npm
+Trusted Publisher / 2FA setup) lives in [`docs/maintainers.md`](docs/maintainers.md).
 
 ## Local end-to-end check (optional)
 
