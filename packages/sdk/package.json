@@ -1,6 +1,6 @@
 {
   "name": "@simplyforms/sdk",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Official client for SimplyForms. Submit form data from the browser, Node 20+, Bun, Deno, or any Edge runtime.",
   "keywords": [
     "simplyforms",
