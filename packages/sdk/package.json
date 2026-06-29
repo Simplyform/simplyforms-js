@@ -16,11 +16,11 @@
   "homepage": "https://www.simplyforms.dev",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/simplyform/simplyforms-js.git",
+    "url": "git+https://github.com/Simplyform/simplyforms-js.git",
     "directory": "packages/sdk"
   },
   "bugs": {
-    "url": "https://github.com/simplyform/simplyforms-js/issues"
+    "url": "https://github.com/Simplyform/simplyforms-js/issues"
   },
   "type": "module",
   "sideEffects": false,
