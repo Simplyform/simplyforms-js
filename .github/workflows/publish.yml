@@ -69,17 +69,17 @@ jobs:
         run: pnpm -r test
 
       # Opens/updates the "Version Packages" PR when changesets are pending.
-      # No `publish` input: the actual publish stays on the explicit `npm stage`
-      # step below so we control staging + the OIDC/provenance flags.
+      # No `publish-script` input: the actual publish stays on the explicit
+      # `npm stage` step below so we control staging + the OIDC/provenance flags.
+      # Auth uses the action's `github-token` input default (github.token) --
+      # v2 no longer reads the GITHUB_TOKEN env var.
       - name: Create or update the Version Packages PR
         id: changesets
         uses: changesets/action@198f833dd7d863100ea6e28967bc9a9fdefadb0a # v2.1.0
         with:
-          version: pnpm changeset version
-          commit: 'chore: version packages'
-          title: 'chore: version packages'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          version-script: pnpm changeset version
+          commit-message: 'chore: version packages'
+          pr-title: 'chore: version packages'
 
       # Stage only after the Version PR has merged (no pending changesets).
       # During the run that merely opens the Version PR, changesets/action has
@@ -89,7 +89,7 @@ jobs:
       # @simplyforms/sdk has no workspace dependencies, so `npm stage publish`
       # stages the package directory as-is (no `workspace:*` rewrite, no pack).
       - name: Stage @simplyforms/sdk
-        if: steps.changesets.outputs.hasChangesets == 'false'
+        if: steps.changesets.outputs['has-changesets'] == 'false'
         working-directory: packages/sdk
         run: |
           VERSION=$(node -p "require('./package.json').version")
@@ -108,7 +108,7 @@ jobs:
       # CycloneDX SBOM attached. Idempotent -- the tag-existence check makes
       # re-runs no-ops.
       - name: Tag and release with SBOM
-        if: steps.changesets.outputs.hasChangesets == 'false'
+        if: steps.changesets.outputs['has-changesets'] == 'false'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
