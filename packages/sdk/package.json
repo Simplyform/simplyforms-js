@@ -65,10 +65,10 @@
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
-    "@vitest/coverage-v8": "^4.1.10",
-    "publint": "^0.3.23",
+    "@vitest/coverage-v8": "^4.1.11",
+    "publint": "^0.3.24",
     "tsup": "^8.3.5",
     "typescript": "^5.7.2",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.11"
   }
 }
